@@ -273,8 +273,14 @@ bool Board::tryFit(int x, int y)
                 alreadyPlaced.insert({pentomino, {i, placedCords}});
                 //cout<<"slojihme ["<<pentomino<<"]"<<pentomino->getSymbol()<<" na ["<<x<<", "<<y<<"]"<<endl;
                 
-                if(tryFit(next_x, next_y)) return true;
-                
+                if(tryFit(next_x, next_y)) 
+                {
+                    char shouldContinue = 'n';
+                    cout<<*this<< "Solution found in "<< tries<<" tries\n";
+                    cout<<"Do you want to continue? (Y/N)";
+                    cin>>shouldContinue;
+                    return shouldContinue=='N' || shouldContinue=='n';
+                }                
                 //cout<<"mahame "<<pentomino->getSymbol()<<endl;
                 removeNode(alreadyPlaced[pentomino].second.x, alreadyPlaced[pentomino].second.y, pentomino->getPosiblePlacements()[i]);
                 alreadyPlaced.erase(pentomino);
@@ -286,14 +292,15 @@ bool Board::tryFit(int x, int y)
     return false ;
 }
 
-bool Board::solve(int& tries)
+bool Board::solve()
 {
-    
-    bool solved = (x<3 || y<3 || x*y < 60) ? false : tryFit(0, 0) ;
+    if(x<3 || y<3 || x*y < 60)
+    {
+        cout<<"No valid solutions the board must be atleat 60 blocks in surface";
+        return false; 
+    }
 
-    tries = this->tries;
-
-    return solved;
+    return tryFit(0, 0);
 }
 
 ostream& operator<< (ostream& outs, const Board& obj )

@@ -44,7 +44,7 @@ public:
     
     Coordinate placeNode(int x, int y, Figure* pentominoToCheck, int variationIndex);
     bool removeNode(int x, int y, vector<Coordinate> variationIndex);
-    bool solve(int& tries);
+    bool solve();
 
     inline vector<vector<char>> getBoard() const {return board;}
     inline vector<Figure*> getPentominos() const {return pentominos;}
