@@ -27,9 +27,12 @@ private:
     int x;
     int y;
     char empty = ' ';
+    char block = '-';
     char fill = 219;//206 - 219;
 
+    unsigned int solutions = 0;
     unsigned int tries = 0;
+    unsigned int blockedUnits = 0;
 
     vector<Coordinate> canPlace(int x, int y, vector<Coordinate> variationIndex);
 
@@ -45,6 +48,8 @@ public:
     Coordinate placeNode(int x, int y, Figure* pentominoToCheck, int variationIndex);
     bool removeNode(int x, int y, vector<Coordinate> variationIndex);
     bool solve();
+
+    void blockNode(int x, int y);
 
     inline vector<vector<char>> getBoard() const {return board;}
     inline vector<Figure*> getPentominos() const {return pentominos;}

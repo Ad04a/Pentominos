@@ -18,7 +18,7 @@ Board::Board(int x, int y)
     }
 
     colorCodes.insert({empty, "\033[38;5;231m"});
-
+    colorCodes.insert({block, "\033[38;5;0m"});
 
     //I is 1st becasue it has a 5 side
     vector<vector<Coordinate>> layout = {
@@ -226,7 +226,12 @@ bool Board::tryFit(int x, int y)
     
     if(alreadyPlaced.size() == pentominos.size())
     {
-        return true;
+        char shouldContinue = 'n';
+        cout<<*this<< "Solution "<<++solutions<<" found in "<< tries<<" tries\n";
+        cout<<"Do you want to continue? (Y/N)";
+        cin>>shouldContinue;
+        return shouldContinue=='N' || shouldContinue=='n';
+       
     }
 
     int next_x = x+1, next_y = y;
@@ -275,11 +280,11 @@ bool Board::tryFit(int x, int y)
                 
                 if(tryFit(next_x, next_y)) 
                 {
-                    char shouldContinue = 'n';
-                    cout<<*this<< "Solution found in "<< tries<<" tries\n";
-                    cout<<"Do you want to continue? (Y/N)";
-                    cin>>shouldContinue;
-                    return shouldContinue=='N' || shouldContinue=='n';
+                    //char shouldContinue = 'n';
+                    //cout<<*this<< "Solution found in "<< tries<<" tries\n";
+                    //cout<<"Do you want to continue? (Y/N)";
+                    //cin>>shouldContinue;
+                    return true; //shouldContinue=='N' || shouldContinue=='n';
                 }                
                 //cout<<"mahame "<<pentomino->getSymbol()<<endl;
                 removeNode(alreadyPlaced[pentomino].second.x, alreadyPlaced[pentomino].second.y, pentomino->getPosiblePlacements()[i]);
@@ -294,13 +299,21 @@ bool Board::tryFit(int x, int y)
 
 bool Board::solve()
 {
-    if(x<3 || y<3 || x*y < 60)
+    solutions = 0;
+    tries = 0;
+    if(x<3 || y<3 || x*y -blockedUnits < 60 )
     {
-        cout<<"No valid solutions the board must be atleat 60 blocks in surface";
+        cout<<"No valid solutions the board must be atleat 60 blocks in surface\n";
         return false; 
     }
 
     return tryFit(0, 0);
+}
+
+void Board::blockNode(int x, int y)
+{
+    board[y][x] = block;
+    blockedUnits++;
 }
 
 ostream& operator<< (ostream& outs, const Board& obj )
