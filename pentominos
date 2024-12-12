@@ -1,0 +1,53 @@
+# compiler
+CXX = g++
+
+# compiler flags
+CXXFLAGS = #-Wall #-pedantic 
+
+COPILEFLAGS = -std=c11
+
+# resulting executable
+TARGET = pentominos.exe
+
+BIN = Intermediate
+
+# source files
+SRCS = main.cpp Private/Figure.cpp Private/Board.cpp
+
+# object files
+OBJ = $(BIN)/main.o $(BIN)/Figure.o $(BIN)/Board.o
+
+DEPENDS = $(OBJ:.o=.d)
+
+.PHONY: all clean ultraclean
+
+all: $(TARGET) run 
+
+$(TARGET): $(BIN) $(OBJ) 
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+
+$(BIN):
+	mkdir $(BIN)
+
+
+-include $(DEPENDS)
+
+# $@ - the target, $< - the first dependacy
+$(BIN)/%.o: %.cpp pentominos
+	$(CXX) $(CXXFLAGS) -MMD -o $@ -c $< 
+
+$(BIN)/%.o: Private/%.cpp pentominos
+	$(CXX) $(CXXFLAGS) -MMD -o $@ -c $< 
+
+run: $(TARGET)
+	$(TARGET)
+
+clean: 
+	del $(BIN)\*.o
+	del $(BIN)\*.d
+	rmdir $(BIN)
+
+ultraclean: clean
+	del $(TARGET)
+
+cleanrun: $(TARGET) clean run ultraclean
