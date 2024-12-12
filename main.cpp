@@ -13,19 +13,7 @@ int main()
 
     cout<<endl<<"---------------------------"<<endl;
 
-    /*board1.placeNode(3, 2, 0);
-    board1.placeNode(0, 0, 1);
-    board1.placeNode(2, 1, 2);*/
-
-    int k=0;
-
-    for(int j =0 ;j<6; j++)
-    {
-        for(int i=0; i<5; i++)
-        {
-            board1.placeNode(i, j, k) ? k++ : k;
-        }
-    }
+    board1.solve();
 
     cout<<board1;
     return 0;

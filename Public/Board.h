@@ -24,16 +24,22 @@ private:
 
     map<char, string> colorCodes;
 
+    int x;
+    int y;
     char empty = ' ';
     char fill = 219;//206 - 219;
+
+    vector<Coordinate> canPlace(int x, int y, unsigned int pentominoIndex, int& pentaminoPlacement);
+
+    bool tryFit(int x, int y);
 
 public:
 
     Board(int x, int y);
 
-    vector<Coordinate> canPlace(int x, int y, unsigned int pentominoIndex, int& pentaminoPlacement);
-
+    
     bool placeNode(int x, int y, unsigned int pentominoIndex);
+    bool solve();
 
     inline vector<vector<char>> getBoard() const {return board;}
     inline map<char, string> getColors() const {return colorCodes;}

@@ -4,6 +4,8 @@
 
 Board::Board(int x, int y)
 {
+    this->x = x;
+    this->y = y;
     //board = new vector<vector<char>>();
     for(int i=0; i<y; i++)
     {
@@ -17,28 +19,43 @@ Board::Board(int x, int y)
 
     colorCodes.insert({empty, "\033[38;5;231m"});
 
-    vector<vector<Coordinate>> layout = {
-        {Coordinate(-1,1), Coordinate(0,1), Coordinate(1,1), Coordinate(0,2)} // X
-    };
-    pentominos.push_back(new Figure(layout, 'X'));
-    colorCodes.insert({'X', "\033[38;5;6m"});
 
-    layout = {
-        {Coordinate(1,0), Coordinate(2,0), Coordinate(3,0), Coordinate(4,0)}, // I
-        {Coordinate(0,1), Coordinate(0,2), Coordinate(0,3), Coordinate(0,4)}  // --
+    vector<vector<Coordinate>> layout = {
+        {Coordinate(1,0), Coordinate(2,0), Coordinate(3,0), Coordinate(4,0)}, // --
+        {Coordinate(0,1), Coordinate(0,2), Coordinate(0,3), Coordinate(0,4)}  // I
     };
     pentominos.push_back(new Figure(layout, 'I'));
     colorCodes.insert({'I', "\033[38;5;196m"});
 
 
     layout = {
-        {Coordinate(0,1), Coordinate(1,1), Coordinate(2,1), Coordinate(2,0)}, // U
-        {Coordinate(1,0), Coordinate(1,1), Coordinate(1,2), Coordinate(0,2)}, // >
+        {Coordinate(1,0), Coordinate(2,0), Coordinate(0,1), Coordinate(0,2)}, // 
+        {Coordinate(1,0), Coordinate(2,0), Coordinate(2,1), Coordinate(2,2)}, // 
+        {Coordinate(0,1), Coordinate(0,2), Coordinate(1,2), Coordinate(2,2)}, // 
+        {Coordinate(0,1), Coordinate(0,2), Coordinate(-1,2), Coordinate(-2,2)}  // V
+    };
+    pentominos.push_back(new Figure(layout, 'V'));
+    colorCodes.insert({'V', "\033[38;5;201m"});
+
+
+    layout = {
         {Coordinate(0,1), Coordinate(1,0), Coordinate(2,0), Coordinate(2,1)}, // ^
-        {Coordinate(1,0), Coordinate(0,1), Coordinate(0,2), Coordinate(1,2)}  // <
+        {Coordinate(1,0), Coordinate(0,1), Coordinate(0,2), Coordinate(1,2)}, // <
+        {Coordinate(1,0), Coordinate(1,1), Coordinate(1,2), Coordinate(0,2)}, // >
+        {Coordinate(0,1), Coordinate(1,1), Coordinate(2,1), Coordinate(2,0)}  // U
     };
     pentominos.push_back(new Figure(layout, 'U'));
     colorCodes.insert({'U', "\033[38;5;136m"});
+
+
+
+
+    layout = {
+        {Coordinate(-1,1), Coordinate(0,1), Coordinate(1,1), Coordinate(0,2)} // X
+    };
+    pentominos.push_back(new Figure(layout, 'X'));
+    colorCodes.insert({'X', "\033[38;5;6m"});
+
     
 }
 
@@ -56,7 +73,7 @@ vector<Coordinate> Board::canPlace(int x, int y, unsigned int pentominoIndex, in
     {
         for(Coordinate block : position)
         {
-            if(y+block.y<0 || y+block.y>=board.size() || x+block.x<0 || x+block.x>=board[0].size() || board[y+block.y][x+block.x] != empty)
+            if(y+block.y<0 || y+block.y>=this->y || x+block.x<0 || x+block.x>=this->x || board[y+block.y][x+block.x] != empty)
             {
                 break;
             }
@@ -98,11 +115,30 @@ bool Board::placeNode(int x, int y, unsigned int pentominoIndex)
     }
 
     pentominos[pentominoIndex]->setPlacement(currentPlacement);
-    //placedPentominos.insert(pentominos[pentominoIndex], Coordinate(x,y));
+    placedPentominos.insert({pentominos[pentominoIndex], Coordinate(x,y)});
 
     return true;
 }
 
+bool Board::tryFit(int x, int y)
+{
+    int k=0;
+
+    for(int j =0 ;j<this->y; j++)
+    {
+        for(int i=0; i<this->x; i++)
+        {
+            placeNode(i, j, k) ? k++ : k;
+        }
+    }
+}
+
+bool Board::solve()
+{
+
+    tryFit(0,0);
+    
+}
 
 ostream& operator<< (ostream& outs, const Board& obj )
 {
