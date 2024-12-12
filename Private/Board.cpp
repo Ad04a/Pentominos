@@ -15,18 +15,20 @@ Board::Board(int x, int y)
         board.push_back(temp);
     }
 
+    colorCodes.insert({empty, "\033[38;5;231m"});
 
     vector<vector<Coordinate>> layout = {
         {Coordinate(-1,1), Coordinate(0,1), Coordinate(1,1), Coordinate(0,2)} // X
     };
     pentominos.push_back(new Figure(layout, 'X'));
-
+    colorCodes.insert({'X', "\033[38;5;6m"});
 
     layout = {
         {Coordinate(1,0), Coordinate(2,0), Coordinate(3,0), Coordinate(4,0)}, // I
         {Coordinate(0,1), Coordinate(0,2), Coordinate(0,3), Coordinate(0,4)}  // --
     };
     pentominos.push_back(new Figure(layout, 'I'));
+    colorCodes.insert({'I', "\033[38;5;196m"});
 
 
     layout = {
@@ -36,6 +38,7 @@ Board::Board(int x, int y)
         {Coordinate(1,0), Coordinate(0,1), Coordinate(0,2), Coordinate(1,2)}  // <
     };
     pentominos.push_back(new Figure(layout, 'U'));
+    colorCodes.insert({'U', "\033[38;5;136m"});
     
 }
 
@@ -76,7 +79,7 @@ vector<Coordinate> Board::canPlace(int x, int y, unsigned int pentominoIndex, in
 
 bool Board::placeNode(int x, int y, unsigned int pentominoIndex)
 {
-    if(pentominoIndex > pentominos.size()-1)
+    if(pentominoIndex > pentominos.size()-1 || board[y][x] != empty)
     {
         return false;
     }
@@ -103,20 +106,28 @@ bool Board::placeNode(int x, int y, unsigned int pentominoIndex)
 
 ostream& operator<< (ostream& outs, const Board& obj )
 {
+    char empty = obj.getEmpty();
+    char fill = obj.getFill();
+    map<char, string> colors = obj.getColors();
+
     for(vector<char> row : obj.getBoard())
     {
-        for(char unit : row)
+        for(int k=0; k<2; k++)
         {
-            if(unit != obj.getEmpty())
+            for(char unit : row)
             {
-                outs<<"\x1b[32;1m"<<unit;
-                continue;
+                if(unit != empty)
+                {
+                    outs<<colors[unit]<<fill<<fill;
+                    continue;
+                }
+
+                outs<<colors[empty]<<fill<<fill;
+
             }
-
-            outs<<obj.getFill();
-
+            outs<<endl;
         }
-        outs<<endl;
+
     }
 	return outs;
 }

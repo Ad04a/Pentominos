@@ -31,5 +31,6 @@ public:
     inline vector<vector<Coordinate>> getPosiblePlacements(){return posiblePlacements;}
     inline char getSymbol(){return symbol;}
     inline void setPlacement(int placementIndex){currentPlacement = placementIndex;}
+   
     
 };

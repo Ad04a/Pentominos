@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    Board board1(5,6);
+    Board board1(10,10);
 
     cout<<board1;
 
