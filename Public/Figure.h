@@ -9,7 +9,15 @@ struct Coordinate
     int x;
     int y;
 
-    Coordinate(int x, int y) : x(x), y(y){}
+    Coordinate(int x=-1, int y=-1) : x(x), y(y){}
+
+    inline bool operator==(Coordinate a) {
+       return a.x==x && a.y== y;
+    }
+
+    inline bool operator!=(Coordinate a) {
+       return !(operator==(a));
+    }
 };
 
 class Figure
@@ -21,16 +29,16 @@ private:
 
     char symbol;
 
-    int currentPlacement;
+    
 
 public:
 
-    Figure(vector<vector<Coordinate>> posiblePlacements, char symbol);
+    int currentPlacement;
 
+    Figure(vector<vector<Coordinate>> posiblePlacements, char symbol);
 
     inline vector<vector<Coordinate>> getPosiblePlacements(){return posiblePlacements;}
     inline char getSymbol(){return symbol;}
-    inline void setPlacement(int placementIndex){currentPlacement = placementIndex;}
    
     
 };

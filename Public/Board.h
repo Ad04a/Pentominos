@@ -20,8 +20,6 @@ private:
 
     vector<vector<char>> board;
 
-    map<Figure*, Coordinate> placedPentominos;
-
     map<char, string> colorCodes;
 
     int x;
@@ -29,16 +27,16 @@ private:
     char empty = ' ';
     char fill = 219;//206 - 219;
 
-    vector<Coordinate> canPlace(int x, int y, unsigned int pentominoIndex, int& pentaminoPlacement);
+    vector<Coordinate> canPlace(int x, int y, Figure* pentominoToCheck);
 
-    bool tryFit(int x, int y);
+    bool tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced);
 
 public:
 
     Board(int x, int y);
 
     
-    bool placeNode(int x, int y, unsigned int pentominoIndex);
+    Coordinate placeNode(int x, int y, Figure* pentominoToCheck);
     bool solve();
 
     inline vector<vector<char>> getBoard() const {return board;}
