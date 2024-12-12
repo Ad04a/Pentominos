@@ -58,7 +58,7 @@ void solveCustomBoard()
     {   
         cout<<"Current board:\n"<<board;
         cout<<"What to do?\n";
-        cout<<"   (1) bloack a unit\n";
+        cout<<"   (1) block a unit\n";
         cout<<"   (2) solve\n";
         cout<<">>";
 

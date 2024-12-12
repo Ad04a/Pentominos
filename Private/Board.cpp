@@ -249,24 +249,11 @@ bool Board::tryFit(int x, int y)
     {
         return tryFit(next_x, next_y);
     }
-
-    //cout<<"vlizmae na ["<<x<<", "<<y<<"] sus veche slojeni: ";
-    for(map<Figure*, pair<int,Coordinate>>::iterator it = alreadyPlaced.begin(); it != alreadyPlaced.end(); it++)
-    {
-        //cout<<it->first->getSymbol()<<" ["<<it->first<<"], ";
-    }
-    //cout<<endl;
     
     for(Figure* pentomino : pentominos)
     {
-        //cout<<"checkvame dali ima ["<<pentomino<<"]"<<pentomino->getSymbol()<<endl;
-        if(alreadyPlaced.find(pentomino) != alreadyPlaced.end())
-        {
-            //cout<<pentomino->getSymbol()<<" veceh e slojeno"<<endl;
-            continue;
-        }
+        if(alreadyPlaced.find(pentomino) != alreadyPlaced.end()) continue;
 
-        //bool placed = false;
         for(int i=0 ; i<pentomino->getPosiblePlacements().size();i++)
         {
             Coordinate placedCords = placeNode(x, y, pentomino, i);
@@ -276,24 +263,15 @@ bool Board::tryFit(int x, int y)
                 tries++;
 
                 alreadyPlaced.insert({pentomino, {i, placedCords}});
-                //cout<<"slojihme ["<<pentomino<<"]"<<pentomino->getSymbol()<<" na ["<<x<<", "<<y<<"]"<<endl;
                 
-                if(tryFit(next_x, next_y)) 
-                {
-                    //char shouldContinue = 'n';
-                    //cout<<*this<< "Solution found in "<< tries<<" tries\n";
-                    //cout<<"Do you want to continue? (Y/N)";
-                    //cin>>shouldContinue;
-                    return true; //shouldContinue=='N' || shouldContinue=='n';
-                }                
-                //cout<<"mahame "<<pentomino->getSymbol()<<endl;
+                if(tryFit(next_x, next_y)) return true;       
+
                 removeNode(alreadyPlaced[pentomino].second.x, alreadyPlaced[pentomino].second.y, pentomino->getPosiblePlacements()[i]);
                 alreadyPlaced.erase(pentomino);
             }
         }
     }
 
-    //cout<<"end of function\n";
     return false ;
 }
 
