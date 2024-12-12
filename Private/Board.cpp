@@ -159,51 +159,55 @@ Board::Board(int x, int y)
     
 }
 
-vector<Coordinate> Board::canPlace(int x, int y, Figure* pentominoToCheck)
+vector<Coordinate> Board::canPlace(int x, int y, vector<Coordinate> variationIndex)
 {
     vector<Coordinate> ValidCoordinates;
-    if(pentominoToCheck == nullptr)
+
+    cout<<"looking at placement: ";
+    for(Coordinate cord : variationIndex)
     {
-        return ValidCoordinates;
+        cout<<"[" <<cord.x<<", "<<cord.y<< "], ";
+    }
+    cout<<endl;
+    
+    for(Coordinate block : variationIndex)
+    {
+        if(y+block.y<0 || y+block.y>=this->y || x+block.x<0 || x+block.x>=this->x || board[y+block.y][x+block.x] != empty)
+        {
+            cout<<"ignore: "<<"[" <<x <<"+"<<block.x<<", "<<y<<"+"<<block.y<< "], "<<endl;
+            break;
+        }
+
+        ValidCoordinates.push_back(Coordinate(x+block.x,y+block.y));
     }
 
-    pentominoToCheck->currentPlacement = 0;
-
-    for(vector<Coordinate> position : pentominoToCheck->getPosiblePlacements())
+    if(ValidCoordinates.size() != 4)
     {
-        for(Coordinate block : position)
+        cout<<"clearvame kofti opiti shtoto sa: "<<ValidCoordinates.size()<<"---";
+        for(Coordinate cord : ValidCoordinates)
         {
-            if(y+block.y<0 || y+block.y>=this->y || x+block.x<0 || x+block.x>=this->x || board[y+block.y][x+block.x] != empty)
-            {
-                break;
-            }
-
-            ValidCoordinates.push_back(Coordinate(x+block.x,y+block.y));
+            cout<<"[" <<cord.x<<", "<<cord.y<< "], ";
         }
-
-        if(ValidCoordinates.size() == 4)
-        {
-            return ValidCoordinates;
-        }
-
+        cout<<endl;
         ValidCoordinates.clear();
-        pentominoToCheck->currentPlacement++;
-
     }
-    pentominoToCheck->currentPlacement = -1;
+
     return ValidCoordinates;
+
 }
 
-Coordinate Board::placeNode(int x, int y, Figure* pentominoToCheck)
+Coordinate Board::placeNode(int x, int y, Figure* pentominoToCheck, int variationIndex)
 {
-    if(pentominoToCheck==nullptr || board[y][x] != empty)
+    if(pentominoToCheck==nullptr || board[y][x] != empty || variationIndex<0 || variationIndex>=pentominoToCheck->getPosiblePlacements().size())
     {
+        cout<<" short circuit" <<endl;
         return Coordinate();
     }
     //int currentPlacement = -1;
-    vector<Coordinate> ValidCoordinates = canPlace(x, y, pentominoToCheck);
+    vector<Coordinate> ValidCoordinates = canPlace(x, y, pentominoToCheck->getPosiblePlacements()[variationIndex]);
     if(ValidCoordinates.empty())
     {
+        cout<<"no valid placement"<<endl;
         return Coordinate();
     }
 
@@ -216,12 +220,20 @@ Coordinate Board::placeNode(int x, int y, Figure* pentominoToCheck)
 
     //pentominos[pentominoIndex]->setPlacement(currentPlacement);
     //placedPentominos.insert({pentominos[pentominoIndex], Coordinate(x,y)});
-
+    cout<<"gucci"<<endl;
     return Coordinate(x,y);
 }
 
 bool Board::tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced)
 {
+
+    /*cout<<"tryFit";
+
+    if(alreadyPlaced.size() == pentominos.size())
+    {
+        cout<<"reshenie";
+        return true;
+    }
 
     int next_x = x+1, next_y = y;
     if(x == this->x)
@@ -229,21 +241,38 @@ bool Board::tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced)
         x = 0;
         next_y++;
     }
-    if(next_y == this->y) return alreadyPlaced.size() == pentominos.size();
-
-    /*if(board[y][x] != empty)
+    if(next_y == this->y) 
     {
-        return tryFit(next_x, next_y, alreadyPlaced);
-    }*/
-
-    for(int i=0; i<pentominos.size(); i++)
-    {
-        //if(alreadyPlaced[pentominos[i]] != Coordinate(0,0)) continue;
-        //bool isPlaced = placeNode(x, y, i);
-        //if(isPlaced)tryFit(next_x, next_y, alreadyPlaced)
+        cout<<"end of map";
+        return alreadyPlaced.size() == pentominos.size();
     }
 
+    if(board[y][x] != empty)
+    {
+        return tryFit(next_x, next_y, alreadyPlaced);
+    }
 
+    for(Figure* pentomino : pentominos)
+    {
+        cout<<"wtf-"<<pentomino->getSymbol()<<endl;
+        if(alreadyPlaced[pentomino] != Coordinate()) 
+        {
+            cout<<"veche eplacenata";
+            continue;
+        }
+
+        Coordinate placedCords = placeNode(x, y, pentomino);
+
+        if(placedCords != Coordinate())
+        {
+            cout<<"probvame "<< pentomino->getSymbol()<<endl;
+            alreadyPlaced.insert({pentomino, placedCords});
+            tryFit(next_x, next_y, alreadyPlaced);
+        }
+    }
+
+    cout<<"end of function";*/
+    return true;
 }
 
 bool Board::solve()
@@ -252,16 +281,26 @@ bool Board::solve()
     map<Figure*, Coordinate> placedPentominos;
     tryFit(0, 0, placedPentominos);
     
-    int k=0;
+    int l=0;
 
     for(int j =0 ;j<this->y; j++)
     {
         for(int i=0; i<this->x; i++)
         {
-            placeNode(i, j, pentominos[k])!=Coordinate() ? k++ : k;
+            if(l>=pentominos.size()) return true;
+            for(int k=0;k<pentominos[l]->getPosiblePlacements().size(); k++)
+            {   cout<<"["<< i<<","<<j <<"]try - "<<pentominos[l]->getSymbol()<<" : "<<k<<endl;
+                if(placeNode(i, j, pentominos[l], k)!=Coordinate())
+                {
+                    l++;
+                    cout<<*this;
+                    break;
+                }
+            }
+            
         }
     }
-
+    return false;
 }
 
 ostream& operator<< (ostream& outs, const Board& obj )

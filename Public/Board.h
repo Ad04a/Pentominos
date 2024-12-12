@@ -27,7 +27,7 @@ private:
     char empty = ' ';
     char fill = 219;//206 - 219;
 
-    vector<Coordinate> canPlace(int x, int y, Figure* pentominoToCheck);
+    vector<Coordinate> canPlace(int x, int y, vector<Coordinate> variationIndex);
 
     bool tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced);
 
@@ -36,7 +36,7 @@ public:
     Board(int x, int y);
 
     
-    Coordinate placeNode(int x, int y, Figure* pentominoToCheck);
+    Coordinate placeNode(int x, int y, Figure* pentominoToCheck, int variationIndex);
     bool solve();
 
     inline vector<vector<char>> getBoard() const {return board;}
