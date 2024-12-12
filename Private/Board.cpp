@@ -162,19 +162,11 @@ Board::Board(int x, int y)
 vector<Coordinate> Board::canPlace(int x, int y, vector<Coordinate> variationIndex)
 {
     vector<Coordinate> ValidCoordinates;
-
-    cout<<"looking at placement: ";
-    for(Coordinate cord : variationIndex)
-    {
-        cout<<"[" <<cord.x<<", "<<cord.y<< "], ";
-    }
-    cout<<endl;
     
     for(Coordinate block : variationIndex)
     {
         if(y+block.y<0 || y+block.y>=this->y || x+block.x<0 || x+block.x>=this->x || board[y+block.y][x+block.x] != empty)
         {
-            cout<<"ignore: "<<"[" <<x <<"+"<<block.x<<", "<<y<<"+"<<block.y<< "], "<<endl;
             break;
         }
 
@@ -183,12 +175,6 @@ vector<Coordinate> Board::canPlace(int x, int y, vector<Coordinate> variationInd
 
     if(ValidCoordinates.size() != 4)
     {
-        cout<<"clearvame kofti opiti shtoto sa: "<<ValidCoordinates.size()<<"---";
-        for(Coordinate cord : ValidCoordinates)
-        {
-            cout<<"[" <<cord.x<<", "<<cord.y<< "], ";
-        }
-        cout<<endl;
         ValidCoordinates.clear();
     }
 
@@ -200,14 +186,12 @@ Coordinate Board::placeNode(int x, int y, Figure* pentominoToCheck, int variatio
 {
     if(pentominoToCheck==nullptr || board[y][x] != empty || variationIndex<0 || variationIndex>=pentominoToCheck->getPosiblePlacements().size())
     {
-        cout<<" short circuit" <<endl;
         return Coordinate();
     }
-    //int currentPlacement = -1;
+
     vector<Coordinate> ValidCoordinates = canPlace(x, y, pentominoToCheck->getPosiblePlacements()[variationIndex]);
     if(ValidCoordinates.empty())
     {
-        cout<<"no valid placement"<<endl;
         return Coordinate();
     }
 
@@ -218,89 +202,98 @@ Coordinate Board::placeNode(int x, int y, Figure* pentominoToCheck, int variatio
         board[valid.y][valid.x] = pentominoToCheck->getSymbol();
     }
 
-    //pentominos[pentominoIndex]->setPlacement(currentPlacement);
-    //placedPentominos.insert({pentominos[pentominoIndex], Coordinate(x,y)});
-    cout<<"gucci"<<endl;
     return Coordinate(x,y);
 }
 
-bool Board::tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced)
+bool Board::removeNode(int x, int y, vector<Coordinate> variationIndex)
+{
+    for(Coordinate block : variationIndex)
+    {
+        if(y+block.y<0 || y+block.y>=this->y || x+block.x<0 || x+block.x>=this->x || board[y+block.y][x+block.x] == empty)
+        {
+            break;
+        }
+        
+        board[y+block.y][x+block.x] = empty;
+    }
+
+    board[y][x] = empty;
+}
+
+bool Board::tryFit(int x, int y)
 {
 
-    /*cout<<"tryFit";
-
+    
     if(alreadyPlaced.size() == pentominos.size())
     {
-        cout<<"reshenie";
         return true;
     }
 
     int next_x = x+1, next_y = y;
-    if(x == this->x)
+    if(next_x == this->x)
     {
-        x = 0;
+        next_x = 0;
         next_y++;
     }
     if(next_y == this->y) 
     {
-        cout<<"end of map";
         return alreadyPlaced.size() == pentominos.size();
     }
 
     if(board[y][x] != empty)
     {
-        return tryFit(next_x, next_y, alreadyPlaced);
+        return tryFit(next_x, next_y);
     }
 
+    //cout<<"vlizmae na ["<<x<<", "<<y<<"] sus veche slojeni: ";
+    for(map<Figure*, pair<int,Coordinate>>::iterator it = alreadyPlaced.begin(); it != alreadyPlaced.end(); it++)
+    {
+        //cout<<it->first->getSymbol()<<" ["<<it->first<<"], ";
+    }
+    //cout<<endl;
+    
     for(Figure* pentomino : pentominos)
     {
-        cout<<"wtf-"<<pentomino->getSymbol()<<endl;
-        if(alreadyPlaced[pentomino] != Coordinate()) 
+        //cout<<"checkvame dali ima ["<<pentomino<<"]"<<pentomino->getSymbol()<<endl;
+        if(alreadyPlaced.find(pentomino) != alreadyPlaced.end())
         {
-            cout<<"veche eplacenata";
+            //cout<<pentomino->getSymbol()<<" veceh e slojeno"<<endl;
             continue;
         }
 
-        Coordinate placedCords = placeNode(x, y, pentomino);
-
-        if(placedCords != Coordinate())
+        //bool placed = false;
+        for(int i=0 ; i<pentomino->getPosiblePlacements().size();i++)
         {
-            cout<<"probvame "<< pentomino->getSymbol()<<endl;
-            alreadyPlaced.insert({pentomino, placedCords});
-            tryFit(next_x, next_y, alreadyPlaced);
+            Coordinate placedCords = placeNode(x, y, pentomino, i);
+
+            if(placedCords != Coordinate())
+            {
+                tries++;
+
+                alreadyPlaced.insert({pentomino, {i, placedCords}});
+                //cout<<"slojihme ["<<pentomino<<"]"<<pentomino->getSymbol()<<" na ["<<x<<", "<<y<<"]"<<endl;
+                
+                if(tryFit(next_x, next_y)) return true;
+                
+                //cout<<"mahame "<<pentomino->getSymbol()<<endl;
+                removeNode(alreadyPlaced[pentomino].second.x, alreadyPlaced[pentomino].second.y, pentomino->getPosiblePlacements()[i]);
+                alreadyPlaced.erase(pentomino);
+            }
         }
     }
 
-    cout<<"end of function";*/
-    return true;
+    //cout<<"end of function\n";
+    return false ;
 }
 
-bool Board::solve()
+bool Board::solve(int& tries)
 {
     
-    map<Figure*, Coordinate> placedPentominos;
-    tryFit(0, 0, placedPentominos);
-    
-    int l=0;
+    bool solved = (x<3 || y<3 || x*y < 60) ? false : tryFit(0, 0) ;
 
-    for(int j =0 ;j<this->y; j++)
-    {
-        for(int i=0; i<this->x; i++)
-        {
-            if(l>=pentominos.size()) return true;
-            for(int k=0;k<pentominos[l]->getPosiblePlacements().size(); k++)
-            {   cout<<"["<< i<<","<<j <<"]try - "<<pentominos[l]->getSymbol()<<" : "<<k<<endl;
-                if(placeNode(i, j, pentominos[l], k)!=Coordinate())
-                {
-                    l++;
-                    cout<<*this;
-                    break;
-                }
-            }
-            
-        }
-    }
-    return false;
+    tries = this->tries;
+
+    return solved;
 }
 
 ostream& operator<< (ostream& outs, const Board& obj )
@@ -328,6 +321,7 @@ ostream& operator<< (ostream& outs, const Board& obj )
         }
 
     }
+    outs<<colors[empty];
 	return outs;
 }
 

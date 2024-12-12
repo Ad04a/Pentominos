@@ -22,14 +22,20 @@ private:
 
     map<char, string> colorCodes;
 
+    map<Figure*, pair<int,Coordinate>> alreadyPlaced;
+
     int x;
     int y;
     char empty = ' ';
     char fill = 219;//206 - 219;
 
+    unsigned int tries = 0;
+
     vector<Coordinate> canPlace(int x, int y, vector<Coordinate> variationIndex);
 
-    bool tryFit(int x, int y, map<Figure*, Coordinate> alreadyPlaced);
+    bool tryFit(int x, int y);
+
+   
 
 public:
 
@@ -37,9 +43,11 @@ public:
 
     
     Coordinate placeNode(int x, int y, Figure* pentominoToCheck, int variationIndex);
-    bool solve();
+    bool removeNode(int x, int y, vector<Coordinate> variationIndex);
+    bool solve(int& tries);
 
     inline vector<vector<char>> getBoard() const {return board;}
+    inline vector<Figure*> getPentominos() const {return pentominos;}
     inline map<char, string> getColors() const {return colorCodes;}
     inline char getFill()const {return fill;}
     inline char getEmpty()const {return empty;}
